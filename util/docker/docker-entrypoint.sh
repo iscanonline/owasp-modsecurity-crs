@@ -181,5 +181,6 @@ elif [ $WEBSERVER = "Nginx" ]; then
   WEBSERVER_ARGUMENTS=''
 fi
 
+envsubst $(grep -oP '\$\{[a-zA-Z0-9_]+\}' /etc/nginx/conf.d/default.conf.tpl | paste -sd " ") < /etc/nginx/conf.d/default.conf.tpl > /etc/nginx/conf.d/default.conf
 
 exec "$@" $WEBSERVER_ARGUMENTS
