@@ -181,6 +181,16 @@ elif [ $WEBSERVER = "Nginx" ]; then
   WEBSERVER_ARGUMENTS=''
 fi
 
+if [ ! -z "$ADAPTER_AUTHORITATIVE_DNS" ]; then
+
+    host=$(dig SRV $ADAPTER_AUTHORITATIVE_DNS | grep $ADAPTER_AUTHORITATIVE_DNS | grep -v ";" | awk '{print $NF}' | sed 's/.$//')
+    port=$(dig SRV $ADAPTER_AUTHORITATIVE_DNS | grep $ADAPTER_AUTHORITATIVE_DNS | grep -v ";" | awk '{print $(NF-1)}')
+
+    export UPSTREAM="$host:$port"
+fi
+
+echo "UPSTREAM=$UPSTREAM"
+
 envsubst $(grep -oP '\$\{[a-zA-Z0-9_]+\}' /etc/nginx/conf.d/default.conf.tpl | paste -sd " ") < /etc/nginx/conf.d/default.conf.tpl > /etc/nginx/conf.d/default.conf
 
 exec "$@" $WEBSERVER_ARGUMENTS
